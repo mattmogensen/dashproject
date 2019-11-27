@@ -16,8 +16,8 @@ import pandas as pd
 from numpy import *
 import matplotlib.pyplot as plt
 import plotly.express as px
-import os
-from random import randint
+#import os
+#from random import randint
 import plotly.plotly as py
 from plotly.graph_objs import *
  
