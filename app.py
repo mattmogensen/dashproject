@@ -11,7 +11,6 @@ from dash.dependencies import Input, Output, State, Event
 import dash_core_components as dcc
 import dash_html_components as html
 
-
 # Setup the app
 # Make sure not to change this file name or the variable names below,
 # the template is configured to execute 'server' on 'app.py'
@@ -403,4 +402,4 @@ def update_table(value):
 
 # Run the Dash app
 if __name__ == '__main__':
-    app.server.run(debug=True, threaded=True)
+    app.server.run(debug=False, threaded=True)
