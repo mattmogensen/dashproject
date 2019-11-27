@@ -1,0 +1,406 @@
+# Import required libraries
+import os
+from random import randint
+
+import plotly.plotly as py
+from plotly.graph_objs import *
+
+import flask
+import dash
+from dash.dependencies import Input, Output, State, Event
+import dash_core_components as dcc
+import dash_html_components as html
+
+
+# Setup the app
+# Make sure not to change this file name or the variable names below,
+# the template is configured to execute 'server' on 'app.py'
+server = flask.Flask(__name__)
+server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
+app = dash.Dash(__name__, server=server)
+
+from dash_table import DataTable
+import pandas as pd
+from numpy import *
+import matplotlib.pyplot as plt
+import plotly.express as px
+ 
+prain=0.666667
+pacid=0.8
+pdetector=0.8
+pmold=0.4
+psugar=0.5
+risktol=72000
+riskave=1/risktol
+nonbcase=1000
+bcase=700
+bottles=12
+salesthin=20
+salesnow=29
+salesbulk=10
+sales25=35
+sales20=30
+sales07=25
+salesb=80
+repdamage=250000
+repb=150000
+costdata=10000
+costspores=100000
+    
+def generate_defaults():
+    global prain,pdetector,pmold,psugar,risktol,riskave,nonbcase,\
+    bcase,bottles,salesthin,salesnow,salesbulk,sales25,sales20,\
+    sales07,salesb,repdamage,repb,costdata,costspores,pacid
+    
+    prain=0.666667
+    pacid=0.8
+    pdetector=0.8
+    pmold=0.4
+    psugar=0.5
+    risktol=72000
+    riskave=1/risktol
+    nonbcase=1000
+    bcase=700
+    bottles=12
+    salesthin=20
+    salesnow=29
+    salesbulk=10
+    sales25=35
+    sales20=30
+    sales07=25
+    salesb=80
+    repdamage=250000
+    repb=150000
+    costdata=10000
+    costspores=100000
+    
+def generate_valuetables():
+    global sporesonlytable,dataonlytable,sporesanddatatable,harvestnowtable,\
+    nosporesnodatatable
+    
+    sporesonlytable = []
+    sporesonlytable.append(bcase*bottles*salesb+repb-costspores)
+    #sporesonlytable.append(nonbcase*bottles*salesbulk-costspores)
+    #sporesonlytable.append(0-costspores)
+    #sporesonlytable.append(nonbcase*bottles*salesthin-costspores-repdamage)  
+    sporesonlytable.append(nonbcase*bottles*sales25-costspores)
+    sporesonlytable.append(nonbcase*bottles*sales20-costspores)
+    sporesonlytable.append(nonbcase*bottles*sales07-costspores)
+    
+    dataonlytable = []
+    dataonlytable.append(bcase*bottles*salesb+repb-costdata)
+    dataonlytable.append(nonbcase*bottles*salesbulk-costdata)
+    dataonlytable.append(0-costdata)
+    dataonlytable.append(nonbcase*bottles*salesthin-costdata-repdamage)  
+    dataonlytable.append(nonbcase*bottles*sales25-costdata)
+    dataonlytable.append(nonbcase*bottles*sales20-costdata)
+    dataonlytable.append(nonbcase*bottles*sales07-costdata)
+    
+    sporesanddatatable = []
+    sporesanddatatable.append(bcase*bottles*salesb+repb-costspores-costdata)
+    #sporesanddatatable.append(nonbcase*bottles*salesbulk-costspores-costdata)
+    #sporesanddatatable.append(0-costdata-costspores)
+    #sporesanddatatable.append(nonbcase*bottles*salesthin-costdata-costspores-repdamage)  
+    sporesanddatatable.append(nonbcase*bottles*sales25-costdata-costspores)
+    sporesanddatatable.append(nonbcase*bottles*sales20-costdata-costspores)
+    sporesanddatatable.append(nonbcase*bottles*sales07-costdata-costspores)
+    
+    nosporesnodatatable = []
+    nosporesnodatatable.append(bcase*bottles*salesb+repb)
+    nosporesnodatatable.append(nonbcase*bottles*salesbulk)
+    nosporesnodatatable.append(0-costdata)
+    nosporesnodatatable.append(nonbcase*bottles*salesthin-repdamage)  
+    nosporesnodatatable.append(nonbcase*bottles*sales25)
+    nosporesnodatatable.append(nonbcase*bottles*sales20)
+    nosporesnodatatable.append(nonbcase*bottles*sales07)
+    
+    harvestnowtable = []
+    harvestnowtable.append(nonbcase*bottles*salesnow)
+    
+    global valuetable
+    valuetable = sporesonlytable + dataonlytable + sporesanddatatable + \
+    nosporesnodatatable + harvestnowtable
+    
+def generate_utables():
+    global usporesonlytable,udataonlytable,usporesanddatatable,uharvestnowtable,utable,\
+    unosporesnodatatable
+
+    usporesonlytable = []
+    usporesonlytable.append(-exp(-(bcase*bottles*salesb+repb-costspores)*riskave))
+    #usporesonlytable.append(-exp(-(nonbcase*bottles*salesbulk-costspores)*riskave))
+    #usporesonlytable.append(-exp(-(0-costspores)*riskave))
+    #usporesonlytable.append(-exp(-(nonbcase*bottles*salesthin-costspores-repdamage)*riskave))
+    usporesonlytable.append(-exp(-(nonbcase*bottles*sales25-costspores)*riskave))
+    usporesonlytable.append(-exp(-(nonbcase*bottles*sales20-costspores)*riskave))
+    usporesonlytable.append(-exp(-(nonbcase*bottles*sales07-costspores)*riskave))
+    
+    udataonlytable = []
+    udataonlytable.append(-exp(-(bcase*bottles*salesb+repb-costdata)*riskave))
+    udataonlytable.append(-exp(-(nonbcase*bottles*salesbulk-costdata)*riskave))
+    udataonlytable.append(-exp(-(0-costdata)*riskave))
+    udataonlytable.append(-exp(-(nonbcase*bottles*salesthin-costdata-repdamage)*riskave))
+    udataonlytable.append(-exp(-(nonbcase*bottles*sales25-costdata)*riskave))
+    udataonlytable.append(-exp(-(nonbcase*bottles*sales20-costdata)*riskave))
+    udataonlytable.append(-exp(-(nonbcase*bottles*sales07-costdata)*riskave))
+    
+    usporesanddatatable = []
+    usporesanddatatable.append(-exp(-(bcase*bottles*salesb+repb-costspores-costdata)*riskave))
+    #usporesanddatatable.append(-exp(-(nonbcase*bottles*salesbulk-costspores-costdata)*riskave))
+    #usporesanddatatable.append(-exp(-(0-costspores-costdata)*riskave))
+    #usporesanddatatable.append(-exp(-(nonbcase*bottles*salesthin-costspores-costdata-repdamage)*riskave))
+    usporesanddatatable.append(-exp(-(nonbcase*bottles*sales25-costspores-costdata)*riskave))
+    usporesanddatatable.append(-exp(-(nonbcase*bottles*sales20-costspores-costdata)*riskave))
+    usporesanddatatable.append(-exp(-(nonbcase*bottles*sales07-costspores-costdata)*riskave))
+    
+    unosporesnodatatable = []
+    unosporesnodatatable.append(-exp(-(bcase*bottles*salesb+repb)*riskave))
+    unosporesnodatatable.append(-exp(-(nonbcase*bottles*salesbulk)*riskave))
+    unosporesnodatatable.append(-exp(-(0-costdata)*riskave))
+    unosporesnodatatable.append(-exp(-(nonbcase*bottles*salesthin-repdamage)*riskave))
+    unosporesnodatatable.append(-exp(-(nonbcase*bottles*sales25)*riskave))
+    unosporesnodatatable.append(-exp(-(nonbcase*bottles*sales20)*riskave))
+    unosporesnodatatable.append(-exp(-(nonbcase*bottles*sales07)*riskave))
+    
+    uharvestnowtable = []
+    uharvestnowtable.append(-exp(-(nonbcase*bottles*salesnow)*riskave))
+    
+    utable = []
+    utable = usporesonlytable + udataonlytable + usporesanddatatable + \
+    unosporesnodatatable + uharvestnowtable
+        
+    global normusporesonlytable
+    normusporesonlytable = []
+    i = 0
+    while i < len(usporesonlytable):
+        normusporesonlytable.append((usporesonlytable[i]-min(utable))/(max(utable)-min(utable)))
+        i+=1
+        
+    global normudataonlytable
+    normudataonlytable = []
+    i = 0
+    while i < len(udataonlytable):
+        normudataonlytable.append((udataonlytable[i]-min(utable))/(max(utable)-min(utable)))
+        i+=1
+        
+    global normusporesanddatatable
+    normusporesanddatatable = []
+    i = 0
+    while i < len(usporesanddatatable):
+        normusporesanddatatable.append((usporesanddatatable[i]-min(utable))/(max(utable)-min(utable)))
+        i+=1
+        
+    global normunosporesnodatatable
+    normunosporesnodatatable = []
+    i = 0
+    while i < len(unosporesnodatatable):
+        normunosporesnodatatable.append((unosporesnodatatable[i]-min(utable))/(max(utable)-min(utable)))
+        i+=1
+        
+    global normuharvestnowtable
+    normuharvestnowtable = []
+    normuharvestnowtable.append((uharvestnowtable[0]-min(utable))/(max(utable)-min(utable)))
+    
+    global normutable
+    normutable = normusporesonlytable + normudataonlytable + normusporesanddatatable +\
+                                 normunosporesnodatatable + normuharvestnowtable
+
+def generate_CEs():
+    global ubuydata,ubuyspores,ubuydataandspores,ubuynothing,uharvestnow,\
+    buydata,buyspores,buydataandspores,buynothing,harvestnow,valueresults
+    
+    ubuyspores = []
+    ubuyspores.append(prain*usporesonlytable[0]+(1-prain)*(pacid*(psugar*\
+                     (usporesonlytable[1])+(1-psugar)*(usporesonlytable[2]))\
+                     +(1-pacid)*(usporesonlytable[3])))
+    ubuydata = []
+    ubuydata.append(pdetector*(pmold*(udataonlytable[0])+(1-pmold)*(max(udataonlytable[1],udataonlytable[2],udataonlytable[3])))\
+    +(1-pdetector)*(pacid*(psugar*(udataonlytable[4])+(1-psugar)*(udataonlytable[5]))+(1-pacid)*(udataonlytable[6])))
+
+    ubuydataandspores = []
+    ubuydataandspores.append(pdetector*usporesanddatatable[0]+(1-pdetector)*(pacid*(psugar*\
+                     (usporesanddatatable[1])+(1-psugar)*(usporesanddatatable[2]))\
+                     +(1-pacid)*(usporesanddatatable[3])))
+    
+    ubuynothing = []
+    ubuynothing.append(prain*(pmold*(unosporesnodatatable[0])+(1-pmold)*\
+                (max(unosporesnodatatable[1],unosporesnodatatable[2],unosporesnodatatable[3])))\
+                +(1-prain)*(pacid*(psugar*(unosporesnodatatable[4])+(1-psugar)*\
+                (unosporesnodatatable[5]))+(1-pacid)*(unosporesnodatatable[6])))
+    
+    uharvestnow = []
+    uharvestnow.append(uharvestnowtable[0])
+    
+    buyspores = -risktol*log(-ubuyspores[0])
+    buydata = -risktol*log(-ubuydata[0])
+    buydataandspores = -risktol*log(-ubuydataandspores[0])
+    buynothing = -risktol*log(-ubuynothing[0])
+    harvestnow = -risktol*log(-uharvestnow[0])
+    
+    valueresults = [str(int(round(harvestnow))),str(int(round(buynothing))),\
+                    str(int(round(buyspores))),str(int(round(buydata))),str(int(round(buydataandspores)))]
+
+
+
+def generate_means():
+    global Ebuydata,Ebuyspores,Ebuydataandspores,Ebuynothing,Eharvestnow,Evalueresults
+    
+    Ebuyspores = prain*sporesonlytable[0]+(1-prain)*(pacid*(psugar*\
+                     (sporesonlytable[1])+(1-psugar)*(sporesonlytable[2]))\
+                     +(1-pacid)*(sporesonlytable[3]))
+        
+    Ebuydata = pdetector*(pmold*(dataonlytable[0])+(1-pmold)*(max(dataonlytable[1],dataonlytable[2],dataonlytable[3])))\
+    +(1-pdetector)*(pacid*(psugar*(dataonlytable[4])+(1-psugar)*(dataonlytable[5]))+(1-pacid)*(dataonlytable[6]))
+
+    Ebuydataandspores = pdetector*sporesanddatatable[0]+(1-pdetector)*(pacid*(psugar*\
+                     (sporesanddatatable[1])+(1-psugar)*(sporesanddatatable[2]))\
+                     +(1-pacid)*(sporesanddatatable[3]))
+    
+    Ebuynothing = prain*(pmold*(nosporesnodatatable[0])+(1-pmold)*\
+                (max(nosporesnodatatable[1],nosporesnodatatable[2],nosporesnodatatable[3])))\
+                +(1-prain)*(pacid*(psugar*(nosporesnodatatable[4])+(1-psugar)*\
+                (nosporesnodatatable[5]))+(1-pacid)*(nosporesnodatatable[6]))
+    
+    Eharvestnow = harvestnowtable[0]
+    Evalueresults = [str(round(Eharvestnow)),str(round(Ebuynothing)),\
+                     str(round(Ebuyspores)),str(round(Ebuydata)),str(round(Ebuydataandspores))]
+
+def generate_dataframe(Evalueresults,valueresults):
+    Row1 = ['Average profit']
+    Row2 = ['Certain Equivalent']
+    Row1 = Row1 + Evalueresults
+    Row2 = Row2 + valueresults
+    return pd.DataFrame([Row1, Row2])
+
+generate_defaults()
+generate_valuetables()
+generate_utables() 
+generate_CEs()
+generate_means()
+df = generate_dataframe(Evalueresults,valueresults)
+
+global col
+col = [
+    {"id": '0', "name": " "},
+    {"id": '1', "name": "Harvest Now"},
+    {"id": '2', "name": "Buy Nothing and Wait"},
+    {"id": '3', "name": "Buy Spores Only"},
+    {"id": '4', "name": "Buy Data Only"},
+    {"id": '5', "name": "Buy Data and Spores"}]
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app.config['suppress_callback_exceptions'] = True
+    
+app.layout = html.Div([
+        
+    html.Div([
+        
+    html.H1('AK and Partners Consulting'),
+
+    html.Div('''
+        A Freemark Abbey Winery Decision Support Tool
+    '''),
+    html.Div('''
+         Copyright 2019
+    '''),     
+            
+    dcc.ConfirmDialogProvider(
+    children=html.Button(
+        'Reset Defaults',
+    ),
+    id='Reset-button',
+    message='Are you sure you want to reset default parameters?'
+    )],
+    style={'columnCount': 2, 'padding':30}),       
+             
+    html.Div([         
+             
+    html.Label(''),
+    dcc.Slider(
+        id='my-slider',
+        min=0,
+        max=1,
+        step=0.01,
+        value=0.66,
+    ),
+    html.Div(id='slider-output-container'),
+
+    #html.Label('Prob(rain)'),
+    #dcc.Input(value='0.667', type='text'),
+
+    html.Div([
+    dcc.Graph(
+        id='coagraph',
+        figure={
+            'data': [
+                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
+                      "Buy Data Only","Buy Data and Spores"], 'y': valueresults,\
+                    'type': 'bar', 'name': 'Certain Equivalent'},
+               {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
+                      "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
+                   'type': 'bar', 'name': 'Average Payoff'},
+            ],
+            'layout': {
+                'title': 'Decision Visualization'
+            }
+        }
+    ),
+    html.H4(children='Decision Matrix'),
+    
+    DataTable(
+    id='table',
+    columns = col,
+    data = df.to_dict('rows')
+    ),
+    ],style={'columnCount': 1})]),
+])
+
+@app.callback(
+    Output('coagraph', 'figure'),
+    [Input('my-slider', 'value')])
+def update_graph(value):
+    global prain
+    prain = value
+    generate_valuetables()
+    generate_utables() 
+    generate_CEs()
+    generate_means()
+    df = generate_dataframe(Evalueresults,valueresults)
+    return {
+            'data': [
+                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
+                      "Buy Data Only","Buy Data and Spores"], 'y': valueresults,\
+                    'type': 'bar', 'name': 'Certain Equivalent'},
+               {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
+                      "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
+                   'type': 'bar', 'name': 'Average Payoff'},
+            ],
+            'layout': {
+                'title': 'Decision Visualization'
+            }}
+
+
+@app.callback(
+    Output('slider-output-container', 'children'),
+    [Input('my-slider', 'value')])
+def update_rain(value):
+    return 'Prior Probability of Rain is {}'.format(value)
+
+@app.callback(
+    [Output('table','data'),Output('table','columns')],
+    [Input('my-slider', 'value')])
+def update_table(value):
+    global prain
+    prain = value
+    generate_valuetables()
+    generate_utables() 
+    generate_CEs()
+    generate_means()
+    df = generate_dataframe(Evalueresults,valueresults)
+    return df.to_dict('rows'), col
+
+
+# Run the Dash app
+if __name__ == '__main__':
+    app.server.run(debug=True, threaded=True)
