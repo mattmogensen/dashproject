@@ -1,9 +1,11 @@
-#import dash
 import dash
 from dash.dependencies import Input, Output, State, Event
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+from dash_table import DataTable
+import pandas as pd
+from numpy import *
 
 # Initiate the App
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -12,9 +14,6 @@ server = app.server
 app.title=tabtitle
 
 # Import required libraries
-from dash_table import DataTable
-import pandas as pd
-from numpy import *
  
 prain=0.666667
 pacid=0.8
@@ -366,7 +365,6 @@ def update_graph(value):
                 'title': 'Decision Visualization'
             }}
 
-
 @app.callback(
     Output('slider-output-container', 'children'),
     [Input('my-slider', 'value')])
@@ -385,7 +383,6 @@ def update_table(value):
     generate_means()
     df = generate_dataframe(Evalueresults,valueresults)
     return df.to_dict('rows'), col
-
 
 # Run the Dash app
 if __name__ == '__main__':
