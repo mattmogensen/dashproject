@@ -261,8 +261,11 @@ app.title=tabtitle
 ########### Set up the layout
 app.layout = html.Div(children=[
     html.H4(myheading),
+    
     html.Div(id='decision-container',children='Based on the model inputs, Mr. Jaeger should harvest now'),
+    
     html.Div(id='prain-container',children='Probability of Rain: 0.66'),
+    
     dcc.Slider(
         id='prain-slider',
         min=0,
@@ -271,6 +274,7 @@ app.layout = html.Div(children=[
         value=0.66,
     ),
     html.Div(id='risktol-container',children='Risk Tolerance: $72000'),
+    
     dcc.Slider(
         id='risktol-slider',
         min=1000,
@@ -314,25 +318,24 @@ app.layout = html.Div(children=[
     [Input('prain-slider', 'value'),
     Input('risktol-slider', 'value')])
 def update_decision(prain1,riskave):
-    global riskave
-    riskave=1/risktol
+    global risktol
+    risktol=1/riskave
     global prain
     prain=prain1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
     generate_means()
-    
     if max(valueresults)==valueresults[0]:
         return 'Based on the model inputs, Mr. Jaeger should harvest nmow, which would yield a CE of ${}'.format(valueresults[0])
     if max(valueresults)==valueresults[1]:
-        return 'Based on the model inputs, Mr. Jaeger should buy nothing and wait to harvest, which would yield a CE of ${}'.format(valueresults[0])
+        return 'Based on the model inputs, Mr. Jaeger should buy nothing and wait to harvest, which would yield a CE of ${}'.format(valueresults[1])
     if max(valueresults==valueresults[2]:
-        return 'Based on the model inputs, Mr. Jaeger buy the spores only, which would yield a CE of ${}'.format(valueresults[0])
+        return 'Based on the model inputs, Mr. Jaeger buy the spores only, which would yield a CE of ${}'.format(valueresults[2])
     if max(valueresults)==valueresults[3]:
-        return 'Based on the model inputs, Mr. Jaeger buy the data only, which would yield a CE of ${}'.format(valueresults[0])
+        return 'Based on the model inputs, Mr. Jaeger buy the data only, which would yield a CE of ${}'.format(valueresults[3])
     if max(valueresults)==valueresults[4]:
-        return 'Based on the model inputs, Mr. Jaeger should buy both data and spores, which would yield a CE of ${}'.format(valueresults[0])  
+        return 'Based on the model inputs, Mr. Jaeger should buy both data and spores, which would yield a CE of ${}'.format(valueresults[4])  
     
 @app.callback(
     Output('prain-container', 'children'),
