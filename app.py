@@ -317,9 +317,9 @@ app.layout = html.Div(children=[
     Output('decision-container', 'children'),
     [Input('prain-slider', 'value'),
     Input('risktol-slider', 'value')])
-def update_decision(prain1,riskave):
-    global risktol
-    risktol=1/riskave
+def update_decision(prain1,risktol):
+    global riskave
+    riskave=1/risktol
     global prain
     prain=prain1
     generate_valuetables()
