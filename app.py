@@ -260,13 +260,23 @@ app.title=tabtitle
 
 ########### Set up the layout
 app.layout = html.Div(children=[
-    html.H4(myheading),
-    html.Br(),
     
-    html.Div(id='decision-container',children='Based on the model inputs, Mr. Jaeger should harvest now'),
-    html.Br(),
+    html.Div([ 
+        html.H2(myheading),
+        html.Div([
+            html.Button(id='reset',children='Reset Defaults',n_clicks=0),
+            html.Div(['Copyright 2019      '])
+        ],style={'horizontal-align': 'right','textAlign': 'right'})#
+    ],
+    style={'columnCount': 2,'vertical-align':'center'}),
+
+    html.Div(id='decision-container',children='Based on the model inputs, Mr. Jaeger should harvest now',
+            style={'color': 'Red', 'fontSize': 14}),
+    html.H4('Model Inputs'),
     
-    html.Div(id='prain-container',children='Probability of Rain: 0.66'),
+    html.Div([
+        
+    html.Div(id='prain-container',children='Prior probability of light warm rain: 0.66'),
     
     dcc.Slider(
         id='prain-slider',
@@ -275,6 +285,17 @@ app.layout = html.Div(children=[
         step=0.01,
         value=0.66,
     ),
+        
+    html.Div(id='pdetector-container',children='Posterior probability of light warm rain, given data: 0.8'),
+    
+    dcc.Slider(
+        id='pdetector-slider',
+        min=0,
+        max=1,
+        step=0.01,
+        value=0.8,
+    ),
+        
     html.Div(id='risktol-container',children='Risk Tolerance: $72000'),
     
     dcc.Slider(
@@ -282,9 +303,41 @@ app.layout = html.Div(children=[
         min=1000,
         max=1000000,
         step=1000,
-        value=72000,
+        value=72000
     ),
+        
+    html.Div(id='pmold-container',children='Probability of botrytis mold developing, given light warm rain: 0.4'),
     
+    dcc.Slider(
+        id='pmold-slider',
+        min=0,
+        max=1,
+        step=0.01,
+        value=0.4,
+    ),
+        
+    html.Div(id='pacid-container',children='Probability of grape acidity remaining above 0.7%: 0.8'),
+    
+    dcc.Slider(
+        id='pacid-slider',
+        min=0,
+        max=1,
+        step=0.01,
+        value=0.8,
+    ),
+        
+    html.Div(id='psugar-container',children='Probability of sugar content rising above 25%, given acidity above 0.7%: 0.5'),
+    
+    dcc.Slider(
+        id='psugar-slider',
+        min=0,
+        max=1,
+        step=0.01,
+        value=0.5,
+    )],
+        
+    style={'columnCount': 2}),
+                      
     html.H4(children='Decision Visualization'),
     dcc.Graph(
         id='coagraph',
@@ -298,7 +351,7 @@ app.layout = html.Div(children=[
                    'type': 'bar', 'name': 'Average Payoff'},
             ],
             'layout': {
-                'title': 'Graph1'
+                'title': ' '
             }
         }
     ),
@@ -316,15 +369,34 @@ app.layout = html.Div(children=[
     ]
 )
 
+@app.callback([Output('prain-slider', 'value'),
+               Output('pmold-slider', 'value'),
+               Output('pdetector-slider', 'value'),
+               Output('pacid-slider', 'value'),
+               Output('psugar-slider', 'value'),
+               Output('risktol-slider','value')
+              ],[Input('reset', 'n_clicks')])
+def on_click(value):
+    return 0.66,0.4,0.8,0.8,0.5,72000
+    
+    
 @app.callback(
     Output('decision-container', 'children'),
     [Input('prain-slider', 'value'),
-    Input('risktol-slider', 'value')])
-def update_decision(prain1,risktol):
-    global riskave
+     Input('risktol-slider', 'value'),
+     Input('psugar-slider', 'value'),
+     Input('pmold-slider', 'value'),
+     Input('pacid-slider', 'value'),
+     Input('pdetector-slider', 'value')
+    ])
+def update_decision(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
+    global riskave,prain,pmold,pacid,psugar,pdetector
     riskave=1/risktol
-    global prain
     prain=prain1
+    pmold=pmold1
+    pacid=pacid1
+    psugar=psugar1
+    pdetector=pdetector1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -344,7 +416,7 @@ def update_decision(prain1,risktol):
     Output('prain-container', 'children'),
     [Input('prain-slider', 'value')])
 def update_rain(value):
-    return 'Probability of Rain: {}'.format(value)
+    return 'Prior probability of light warm rain: {}'.format(value)
 
 @app.callback(
     Output('risktol-container', 'children'),
@@ -353,14 +425,46 @@ def update_rain(value):
     return 'Risk Tolerance: ${}'.format(value)
 
 @app.callback(
+    Output('psugar-container', 'children'),
+    [Input('psugar-slider', 'value')])
+def update_sugar(value):
+    return 'Probability of sugar content rising above 25%, given acidity above 0.7%: {}'.format(value)
+
+@app.callback(
+    Output('pmold-container', 'children'),
+    [Input('pmold-slider', 'value')])
+def update_mold(value):
+    return 'Probability of botrytis mold developing, given light warm rain: {}'.format(value)
+
+@app.callback(
+    Output('pacid-container', 'children'),
+    [Input('pacid-slider', 'value')])
+def update_acid(value):
+    return 'Probability of grape acidity remaining above 0.7%: {}'.format(value)
+
+@app.callback(
+    Output('pdetector-container', 'children'),
+    [Input('pdetector-slider', 'value')])
+def update_detector(value):
+    return 'Posterior probability of light warm rain, given data: {}'.format(value)
+
+@app.callback(
     Output('coagraph', 'figure'),
     [Input('prain-slider', 'value'),
-     Input('risktol-slider', 'value')])
-def update_graph(prain1,risktol):
-    global riskave
+     Input('risktol-slider', 'value'),
+     Input('psugar-slider', 'value'),
+     Input('pmold-slider', 'value'),
+     Input('pacid-slider', 'value'),
+     Input('pdetector-slider', 'value')
+    ])
+def update_graph(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
+    global riskave,prain,pmold,pacid,psugar,pdetector
     riskave=1/risktol
-    global prain
     prain=prain1
+    pmold=pmold1
+    pacid=pacid1
+    psugar=psugar1
+    pdetector=pdetector1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -382,12 +486,20 @@ def update_graph(prain1,risktol):
 @app.callback(
     [Output('table','data'),Output('table','columns')],
     [Input('prain-slider', 'value'),
-     Input('risktol-slider', 'value')])
-def update_table(prain1,risktol):
-    global riskave
+     Input('risktol-slider', 'value'),
+     Input('psugar-slider', 'value'),
+     Input('pmold-slider', 'value'),
+     Input('pacid-slider', 'value'),
+     Input('pdetector-slider', 'value')
+    ])
+def update_table(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
+    global riskave,prain,pmold,pacid,psugar,pdetector
     riskave=1/risktol
-    global prain
     prain=prain1
+    pmold=pmold1
+    pacid=pacid1
+    psugar=psugar1
+    pdetector=pdetector1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
