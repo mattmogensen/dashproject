@@ -272,7 +272,7 @@ app.layout = html.Div(children=[
     html.Div(id='risktol-container',children='Risk Tolerance: $72000'),
     dcc.Slider(
         id='risktol-slider',
-        min=1,
+        min=1000,
         max=1000000,
         step=1000,
         value=72000,
@@ -289,9 +289,9 @@ app.layout = html.Div(children=[
                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
                       "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
                    'type': 'bar', 'name': 'Average Payoff'},
-            ],
-            'layout': {
-                'title': ' '
+            ]#,
+            #'layout': {
+            #    'title': ' '
             }
         }
     ),
