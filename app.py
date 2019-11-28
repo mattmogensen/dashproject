@@ -3,6 +3,7 @@ import dash
 from dash.dependencies import Input, Output, State, Event
 import dash_core_components as dcc
 import dash_html_components as html
+import plotly.graph_objs as go
 
 # Initiate the App
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -388,4 +389,4 @@ def update_table(value):
 
 # Run the Dash app
 if __name__ == '__main__':
-    app.server.run(debug=False, threaded=True)
+    app.run_server()
