@@ -309,13 +309,13 @@ app.layout = html.Div(children=[
 )
 
 @app.callback(
-    Output('prain-output-container', 'children'),
+    Output('prain-container', 'children'),
     [Input('prain-slider', 'value')])
 def update_rain(value):
     return 'Probability of Rain: {}'.format(value)
 
 @app.callback(
-    Output('risktol-output-container', 'children'),
+    Output('risktol-container', 'children'),
     [Input('risktol-slider', 'value')])
 def update_rain(value):
     return 'Risk Tolerance: ${}'.format(value)
@@ -324,7 +324,7 @@ def update_rain(value):
     Output('coagraph', 'figure'),
     [Input('prain-slider', 'value'),
      Input('risktol-slider', 'value')])
-def update_graph(prain,riskave):
+def update_graph(prain,risktol):
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -347,7 +347,7 @@ def update_graph(prain,riskave):
     [Output('table','data'),Output('table','columns')],
     [Input('prain-slider', 'value'),
      Input('risktol-slider', 'value')])
-def update_table(prain,riskave):
+def update_table(prain,risktol):
     generate_valuetables()
     generate_utables() 
     generate_CEs()
