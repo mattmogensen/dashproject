@@ -294,7 +294,7 @@ app.layout = html.Div(children=[
             }
         }
     ),
-    html.A('Code on Github', href='www.github.com/mdm4061/dashapp'),
+    html.A('www.github.com/mdm4061/dashproject', href='www.github.com/mdm4061/dashproject'),
     html.Br(),
     ]
 )
