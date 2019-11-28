@@ -261,8 +261,10 @@ app.title=tabtitle
 ########### Set up the layout
 app.layout = html.Div(children=[
     html.H4(myheading),
+    html.Br(),
     
     html.Div(id='decision-container',children='Based on the model inputs, Mr. Jaeger should harvest now'),
+    html.Br(),
     
     html.Div(id='prain-container',children='Probability of Rain: 0.66'),
     
@@ -307,8 +309,9 @@ app.layout = html.Div(children=[
     columns = col,
     data = df.to_dict('rows')
     ),
-
-    html.A('www.github.com/mdm4061/dashproject', href='www.github.com/mdm4061/dashproject'),
+    
+    html.Br(),
+    html.A('http://www.github.com/mdm4061/dashproject', href='http://www.github.com/mdm4061/dashproject'),
     html.Br(),
     ]
 )
