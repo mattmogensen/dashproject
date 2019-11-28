@@ -313,7 +313,7 @@ app.layout = html.Div(children=[
     Output('decision-container', 'children'),
     [Input('prain-slider', 'value'),
     Input('risktol-slider', 'value')])
-def update_rain(prain1,riskave):
+def update_decision(prain1,riskave):
     global riskave
     riskave=1/risktol
     global prain
