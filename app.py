@@ -1,42 +1,14 @@
 import dash
-from dash.dependencies import Input, Output, State, Event
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 from dash_table import DataTable
 import pandas as pd
 from numpy import *
 
-# Initiate the App
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-server = app.server
-app.title=tabtitle
+########### Define your variables
 
-# Import required libraries
- 
-prain=0.666667
-pacid=0.8
-pdetector=0.8
-pmold=0.4
-psugar=0.5
-risktol=72000
-riskave=1/risktol
-nonbcase=1000
-bcase=700
-bottles=12
-salesthin=20
-salesnow=29
-salesbulk=10
-sales25=35
-sales20=30
-sales07=25
-salesb=80
-repdamage=250000
-repb=150000
-costdata=10000
-costspores=100000
-    
 def generate_defaults():
     global prain,pdetector,pmold,psugar,risktol,riskave,nonbcase,\
     bcase,bottles,salesthin,salesnow,salesbulk,sales25,sales20,\
@@ -276,32 +248,28 @@ col = [
     {"id": '3', "name": "Buy Spores Only"},
     {"id": '4', "name": "Buy Data Only"},
     {"id": '5', "name": "Buy Data and Spores"}]
-    
-app.layout = html.Div([
-        
-    html.Div([
-        
-    html.H1('AK and Partners Consulting'),
 
-    html.Div('''
-        A Freemark Abbey Winery Decision Support Tool
-    '''),
-    html.Div('''
-         Copyright 2019
-    '''),     
-            
-    dcc.ConfirmDialogProvider(
-    children=html.Button(
-        'Reset Defaults',
-    ),
-    id='Reset-button',
-    message='Are you sure you want to reset default parameters?'
-    )],
-    style={'columnCount': 2, 'padding':30}),       
-             
-    html.Div([         
-             
-    html.Label(''),
+beers=['Chesapeake Stout', 'Snake Dog IPA', 'Imperial Porter', 'Double Dog IPA']
+ibu_values=[35, 60, 85, 75]
+abv_values=[5.4, 7.1, 9.2, 4.3]
+color1='lightblue'
+color2='darkgreen'
+mytitle='Beer Comparison'
+tabtitle='Decision Support Tool'
+myheading='AK and Partners Consulting'
+label1='IBU'
+label2='ABV'
+
+########### Initiate the app
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
+app.title=tabtitle
+
+########### Set up the layout
+app.layout = html.Div(children=[
+    html.H1(myheading),
+    html.Div(id='slider-output-container',children='Probability of Rain: 0.66'),
     dcc.Slider(
         id='my-slider',
         min=0,
@@ -309,12 +277,7 @@ app.layout = html.Div([
         step=0.01,
         value=0.66,
     ),
-    html.Div(id='slider-output-container'),
-
-    #html.Label('Prob(rain)'),
-    #dcc.Input(value='0.667', type='text'),
-
-    html.Div([
+    
     dcc.Graph(
         id='coagraph',
         figure={
@@ -331,15 +294,16 @@ app.layout = html.Div([
             }
         }
     ),
-    html.H4(children='Decision Matrix'),
-    
-    DataTable(
-    id='table',
-    columns = col,
-    data = df.to_dict('rows')
-    ),
-    ],style={'columnCount': 1})]),
-])
+    html.A('Code on Github', href='www.github.com/mdm4061/dashapp'),
+    html.Br(),
+    ]
+)
+
+@app.callback(
+    Output('slider-output-container', 'children'),
+    [Input('my-slider', 'value')])
+def update_rain(value):
+    return 'Probability of Rain: {}'.format(value)
 
 @app.callback(
     Output('coagraph', 'figure'),
@@ -365,25 +329,5 @@ def update_graph(value):
                 'title': 'Decision Visualization'
             }}
 
-@app.callback(
-    Output('slider-output-container', 'children'),
-    [Input('my-slider', 'value')])
-def update_rain(value):
-    return 'Prior Probability of Rain is {}'.format(value)
-
-@app.callback(
-    [Output('table','data'),Output('table','columns')],
-    [Input('my-slider', 'value')])
-def update_table(value):
-    global prain
-    prain = value
-    generate_valuetables()
-    generate_utables() 
-    generate_CEs()
-    generate_means()
-    df = generate_dataframe(Evalueresults,valueresults)
-    return df.to_dict('rows'), col
-
-# Run the Dash app
 if __name__ == '__main__':
     app.run_server()
