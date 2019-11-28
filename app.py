@@ -327,7 +327,7 @@ def update_decision(prain1,risktol):
     generate_CEs()
     generate_means()
     if max(valueresults)==valueresults[0]:
-        return 'Based on the model inputs, Mr. Jaeger should harvest nmow, which would yield a CE of ${}'.format(valueresults[0])
+        return 'Based on the model inputs, Mr. Jaeger should harvest now, which would yield a CE of ${}'.format(valueresults[0])
     if max(valueresults)==valueresults[1]:
         return 'Based on the model inputs, Mr. Jaeger should buy nothing and wait to harvest, which would yield a CE of ${}'.format(valueresults[1])
     if max(valueresults)==valueresults[2]:
