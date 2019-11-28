@@ -249,16 +249,8 @@ col = [
     {"id": '4', "name": "Buy Data Only"},
     {"id": '5', "name": "Buy Data and Spores"}]
 
-beers=['Chesapeake Stout', 'Snake Dog IPA', 'Imperial Porter', 'Double Dog IPA']
-ibu_values=[35, 60, 85, 75]
-abv_values=[5.4, 7.1, 9.2, 4.3]
-color1='lightblue'
-color2='darkgreen'
-mytitle='Beer Comparison'
 tabtitle='Decision Support Tool'
 myheading='AK and Partners Consulting'
-label1='IBU'
-label2='ABV'
 
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -268,7 +260,7 @@ app.title=tabtitle
 
 ########### Set up the layout
 app.layout = html.Div(children=[
-    html.H1(myheading),
+    html.H4(myheading),
     html.Div(id='slider-output-container',children='Probability of Rain: 0.66'),
     dcc.Slider(
         id='my-slider',
