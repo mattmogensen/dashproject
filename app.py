@@ -327,8 +327,8 @@ def update_rain(value):
 def update_graph(value):
     global prain
     global riskave
-    prain = value
-    riskave = value
+    prain = Input('prain-slider', 'value')
+    riskave = Input('risktol-slider', 'value')
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -353,9 +353,9 @@ def update_graph(value):
      Input('risktol-slider', 'value')])
 def update_table(value):
     global prain
-    prain = value
+    prain = Input('prain-slider', 'value')
     global riskave
-    riskave = value
+    riskave = Input('risktol-slider', 'value')
     generate_valuetables()
     generate_utables() 
     generate_CEs()
