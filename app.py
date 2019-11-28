@@ -301,8 +301,7 @@ app.layout = html.Div(children=[
     columns = col,
     data = df.to_dict('rows')
     ),
-    ],style={'columnCount': 1})]),
-    
+
     html.A('www.github.com/mdm4061/dashproject', href='www.github.com/mdm4061/dashproject'),
     html.Br(),
     ]
@@ -337,6 +336,19 @@ def update_graph(value):
             'layout': {
                 'title': 'Decision Visualization'
             }}
+
+@app.callback(
+    [Output('table','data'),Output('table','columns')],
+    [Input('my-slider', 'value')])
+def update_table(value):
+    global prain
+    prain = value
+    generate_valuetables()
+    generate_utables() 
+    generate_CEs()
+    generate_means()
+    df = generate_dataframe(Evalueresults,valueresults)
+    return df.to_dict('rows'), col
 
 if __name__ == '__main__':
     app.run_server()
