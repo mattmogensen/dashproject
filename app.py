@@ -324,11 +324,7 @@ def update_rain(value):
     Output('coagraph', 'figure'),
     [Input('prain-slider', 'value'),
      Input('risktol-slider', 'value')])
-def update_graph(value):
-    global prain
-    global riskave
-    prain = Input('prain-slider', 'value')
-    riskave = Input('risktol-slider', 'value')
+def update_graph(prain,riskave):
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -351,11 +347,7 @@ def update_graph(value):
     [Output('table','data'),Output('table','columns')],
     [Input('prain-slider', 'value'),
      Input('risktol-slider', 'value')])
-def update_table(value):
-    global prain
-    prain = Input('prain-slider', 'value')
-    global riskave
-    riskave = Input('risktol-slider', 'value')
+def update_table(prain,riskave):
     generate_valuetables()
     generate_utables() 
     generate_CEs()
