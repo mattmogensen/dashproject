@@ -227,7 +227,7 @@ def generate_means():
                      str(round(Ebuyspores)),str(round(Ebuydata)),str(round(Ebuydataandspores))]
 
 def generate_dataframe(Evalueresults,valueresults):
-    Row1 = ['Average profit']
+    Row1 = ['Average Profit']
     Row2 = ['Certain Equivalent']
     Row1 = Row1 + Evalueresults
     Row2 = Row2 + valueresults
@@ -261,15 +261,24 @@ app.title=tabtitle
 ########### Set up the layout
 app.layout = html.Div(children=[
     html.H4(myheading),
-    html.Div(id='slider-output-container',children='Probability of Rain: 0.66'),
+    html.Div(id='prain-container',children='Probability of Rain: 0.66'),
     dcc.Slider(
-        id='my-slider',
+        id='prain-slider',
         min=0,
         max=1,
         step=0.01,
         value=0.66,
     ),
+    html.Div(id='risktol-container',children='Risk Tolerance: $72000'),
+    dcc.Slider(
+        id='risktol-slider',
+        min=1,
+        max=1000000,
+        step=1000,
+        value=72000,
+    ),
     
+    html.H4(children='Decision Visualization'),
     dcc.Graph(
         id='coagraph',
         figure={
@@ -282,7 +291,7 @@ app.layout = html.Div(children=[
                    'type': 'bar', 'name': 'Average Payoff'},
             ],
             'layout': {
-                'title': 'Decision Visualization'
+                'title': ' '
             }
         }
     ),
@@ -300,17 +309,26 @@ app.layout = html.Div(children=[
 )
 
 @app.callback(
-    Output('slider-output-container', 'children'),
-    [Input('my-slider', 'value')])
+    Output('prain-output-container', 'children'),
+    [Input('prain-slider', 'value')])
 def update_rain(value):
     return 'Probability of Rain: {}'.format(value)
 
 @app.callback(
+    Output('risktol-output-container', 'children'),
+    [Input('risktol-slider', 'value')])
+def update_rain(value):
+    return 'Risk Tolerance: ${}'.format(value)
+
+@app.callback(
     Output('coagraph', 'figure'),
-    [Input('my-slider', 'value')])
+    [Input('prain-slider', 'value'),
+     Input('risktol-slider', 'value')])
 def update_graph(value):
     global prain
+    global riskave
     prain = value
+    riskave = value
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -331,10 +349,13 @@ def update_graph(value):
 
 @app.callback(
     [Output('table','data'),Output('table','columns')],
-    [Input('my-slider', 'value')])
+    [Input('prain-slider', 'value'),
+     Input('risktol-slider', 'value')])
 def update_table(value):
     global prain
     prain = value
+    global riskave
+    riskave = value
     generate_valuetables()
     generate_utables() 
     generate_CEs()
