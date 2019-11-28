@@ -289,9 +289,9 @@ app.layout = html.Div(children=[
                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
                       "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
                    'type': 'bar', 'name': 'Average Payoff'},
-            ]#,
-            #'layout': {
-            #    'title': ' '
+            ],
+            'layout': {
+                'title': 'Graph1'
             }
         }
     ),
