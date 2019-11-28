@@ -294,6 +294,15 @@ app.layout = html.Div(children=[
             }
         }
     ),
+    html.H4(children='Decision Matrix'),
+    
+    DataTable(
+    id='table',
+    columns = col,
+    data = df.to_dict('rows')
+    ),
+    ],style={'columnCount': 1})]),
+    
     html.A('www.github.com/mdm4061/dashproject', href='www.github.com/mdm4061/dashproject'),
     html.Br(),
     ]
