@@ -14,9 +14,9 @@ def generate_defaults():
     bcase,bottles,salesthin,salesnow,salesbulk,sales25,sales20,\
     sales07,salesb,repdamage,repb,costdata,costspores,pacid
     
-    prain=0.666667
+    prain=0.67
     pacid=0.8
-    pdetector=0.8
+    pdetector=0.17
     pmold=0.4
     psugar=0.5
     risktol=72000
@@ -33,8 +33,8 @@ def generate_defaults():
     salesb=80
     repdamage=250000
     repb=150000
-    costdata=10000
-    costspores=100000
+    costdata=1000
+    costspores=10000
     
 def generate_valuetables():
     global sporesonlytable,dataonlytable,sporesanddatatable,harvestnowtable,\
@@ -283,7 +283,7 @@ app.layout = html.Div(children=[
         min=0,
         max=1,
         step=0.01,
-        value=0.66,
+        value=0.67,
     ),
         
     html.Div(id='pdetector-container',children='Posterior probability of light warm rain, given data: 0.8'),
@@ -293,9 +293,18 @@ app.layout = html.Div(children=[
         min=0,
         max=1,
         step=0.01,
-        value=0.8,
+        value=0.17,
     ),
-        
+            
+    dcc.RadioItems(id='radio',
+    options=[
+        {'label': 'Detector with Bayesian Updating from Prior', 'value': 'BAY'},
+        {'label': 'User-Selected Posterior Probability', 'value': 'NOM'},
+    ],
+    value='BAY'),
+            
+    html.Div([
+    html.Br(),
     html.Div(id='risktol-container',children='Risk Tolerance: $72000'),
     
     dcc.Slider(
@@ -334,11 +343,17 @@ app.layout = html.Div(children=[
         max=1,
         step=0.01,
         value=0.5,
-    )],
+    )],style={'columnCount':1})],
         
     style={'columnCount': 2}),
-                      
+                                         
     html.H4(children='Decision Visualization'),
+    
+    dcc.Checklist(id='checklist',
+    options=[
+        {'label': 'Certain Equivalent (CE) Display only', 'value': 1},
+    ],value=[1]),
+        
     dcc.Graph(
         id='coagraph',
         figure={
@@ -348,13 +363,14 @@ app.layout = html.Div(children=[
                     'type': 'bar', 'name': 'Certain Equivalent'},
                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
                       "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
-                   'type': 'bar', 'name': 'Average Payoff'},
+                   'type': 'bar', 'name': 'Probability Weighted Average'},
             ],
             'layout': {
                 'title': ' '
             }
         }
     ),
+
     html.H4(children='Decision Matrix'),
     
     DataTable(
@@ -368,16 +384,20 @@ app.layout = html.Div(children=[
     html.Br(),
     ]
 )
-
+    
 @app.callback([Output('prain-slider', 'value'),
                Output('pmold-slider', 'value'),
-               Output('pdetector-slider', 'value'),
+               #Output('pdetector-slider', 'value'),
                Output('pacid-slider', 'value'),
                Output('psugar-slider', 'value'),
-               Output('risktol-slider','value')
-              ],[Input('reset', 'n_clicks')])
-def on_click(value):
-    return 0.66,0.4,0.8,0.8,0.5,72000
+               Output('risktol-slider','value'),
+               Output('checklist','value'),
+              ],[Input('reset', 'n_clicks'),Input('radio','value')])
+def on_click(value,radiovalue):
+    if radiovalue=='BAY':
+        return 0.67,0.4,0.8,0.5,72000,[1]
+    else:
+        return 0.67,0.4,0.8,0.5,72000,[1]
     
     
 @app.callback(
@@ -389,9 +409,10 @@ def on_click(value):
      Input('pacid-slider', 'value'),
      Input('pdetector-slider', 'value')
     ])
-def update_decision(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
-    global riskave,prain,pmold,pacid,psugar,pdetector
-    riskave=1/risktol
+def update_decision(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1):
+    global riskave,prain,pmold,pacid,psugar,pdetector,risktol
+    riskave=1/risktol1
+    risktol=risktol1
     prain=prain1
     pmold=pmold1
     pacid=pacid1
@@ -446,7 +467,20 @@ def update_acid(value):
     Output('pdetector-container', 'children'),
     [Input('pdetector-slider', 'value')])
 def update_detector(value):
-    return 'Posterior probability of light warm rain, given data: {}'.format(value)
+    return 'Posterior probability of light warm rain, given data: {}'.format(round(value,2))
+
+@app.callback(
+    Output('pdetector-slider','value'),
+    [Input('radio','value'),
+     Input('prain-slider','value')])
+def update_detector2(radiovalue,prain1):
+    global prain
+    prain=prain1
+    if radiovalue=='BAY':
+        return max(round(prain-0.5,2),0.1)
+    else:
+        return pdetector
+    
 
 @app.callback(
     Output('coagraph', 'figure'),
@@ -455,33 +489,49 @@ def update_detector(value):
      Input('psugar-slider', 'value'),
      Input('pmold-slider', 'value'),
      Input('pacid-slider', 'value'),
-     Input('pdetector-slider', 'value')
+     Input('pdetector-slider', 'value'),
+     Input('checklist','value'),
+     Input('radio','value')
     ])
-def update_graph(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
-    global riskave,prain,pmold,pacid,psugar,pdetector
-    riskave=1/risktol
+def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue,radiovalue):
+    global riskave,prain,pmold,pacid,psugar,pdetector,risktol
+    riskave=1/risktol1
+    risktol=risktol1
     prain=prain1
     pmold=pmold1
     pacid=pacid1
     psugar=psugar1
-    pdetector=pdetector1
+    if radiovalue=='BAY':
+        pdetector=max(prain1-0.5,0.1)
+    else:
+        pdetector=pdetector1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
     generate_means()
     df = generate_dataframe(Evalueresults,valueresults)
-    return {
+    if cevalue==[1]:
+        return {
             'data': [
                 {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
                       "Buy Data Only","Buy Data and Spores"], 'y': valueresults,\
-                    'type': 'bar', 'name': 'Certain Equivalent'},
-               {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
-                      "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
-                   'type': 'bar', 'name': 'Average Payoff'},
-            ],
-            'layout': {
-                'title': ' '
-            }}
+                    'type': 'bar', 'name': 'Certain Equivalent ($)'}],
+                'layout': {
+                    'title': ' '
+                }}
+    else:
+        return {
+                'data': [
+                    {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
+                          "Buy Data Only","Buy Data and Spores"], 'y': valueresults,\
+                        'type': 'bar', 'name': 'Certain Equivalent ($)'},
+                   {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
+                          "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
+                       'type': 'bar', 'name': 'Probability Weighted Average ($)'},
+                ],
+                'layout': {
+                    'title': ' '
+                }}
 
 @app.callback(
     [Output('table','data'),Output('table','columns')],
@@ -490,11 +540,13 @@ def update_graph(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
      Input('psugar-slider', 'value'),
      Input('pmold-slider', 'value'),
      Input('pacid-slider', 'value'),
-     Input('pdetector-slider', 'value')
+     Input('pdetector-slider', 'value'),
+     Input('checklist','value')
     ])
-def update_table(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
-    global riskave,prain,pmold,pacid,psugar,pdetector
-    riskave=1/risktol
+def update_table(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue):
+    global riskave,prain,pmold,pacid,psugar,pdetector,risktol
+    riskave=1/risktol1
+    risktol=risktol1
     prain=prain1
     pmold=pmold1
     pacid=pacid1
@@ -504,8 +556,18 @@ def update_table(prain1,risktol,psugar1,pmold1,pacid1,pdetector1):
     generate_utables() 
     generate_CEs()
     generate_means()
-    df = generate_dataframe(Evalueresults,valueresults)
-    return df.to_dict('rows'), col
+    if cevalue==[1]:
+        Row2 = ['Certain Equivalent ($)']
+        Row2 = Row2 + valueresults
+        df = pd.DataFrame([Row2])
+        return df.to_dict('rows'), col
+    else:
+        Row1 = ['Probability Weighted Average ($)']
+        Row2 = ['Certain Equivalent ($)']
+        Row1 = Row1 + Evalueresults
+        Row2 = Row2 + valueresults
+        df = pd.DataFrame([Row2, Row1])
+        return df.to_dict('rows'), col
 
 if __name__ == '__main__':
     app.run_server()
