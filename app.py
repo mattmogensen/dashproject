@@ -199,7 +199,7 @@ def generate_CEs():
     harvestnow = -risktol*log(-uharvestnow[0])
     
     valueresults = [str(int(round(harvestnow))),str(int(round(buynothing))),\
-                    str(int(round(buyspores))),str(int(round(buydata))),str(int(round(buydataandspores)))]
+                    str(int(round(buyspores)))]
 
 
 
@@ -224,7 +224,7 @@ def generate_means():
     
     Eharvestnow = harvestnowtable[0]
     Evalueresults = [str(round(Eharvestnow)),str(round(Ebuynothing)),\
-                     str(round(Ebuyspores)),str(round(Ebuydata)),str(round(Ebuydataandspores))]
+                     str(round(Ebuyspores))]
 
 def generate_dataframe(Evalueresults,valueresults):
     Row1 = ['Average Profit']
@@ -245,9 +245,8 @@ col = [
     {"id": '0', "name": " "},
     {"id": '1', "name": "Harvest Now"},
     {"id": '2', "name": "Buy Nothing and Wait"},
-    {"id": '3', "name": "Buy Spores Only"},
-    {"id": '4', "name": "Buy Data Only"},
-    {"id": '5', "name": "Buy Data and Spores"}]
+    {"id": '3', "name": "Buy Spores  and Wait"}]
+
 
 tabtitle='Decision Support Tool'
 myheading='AK and Partners Consulting'
@@ -276,7 +275,7 @@ app.layout = html.Div(children=[
     
     html.Div([
         
-    html.Div(id='prain-container',children='Prior probability of light warm rain: 0.66'),
+    html.Div(id='prain-container',children='Prior probability of light warm rain: 0.67'),
     
     dcc.Slider(
         id='prain-slider',
@@ -286,7 +285,7 @@ app.layout = html.Div(children=[
         value=0.67,
     ),
         
-    html.Div(id='pdetector-container',children='Posterior probability of light warm rain, given data: 0.8'),
+    html.Div(id='pdetector-container',children='Posterior probability of light warm rain: 0.67'),
     
     dcc.Slider(
         id='pdetector-slider',
@@ -298,10 +297,11 @@ app.layout = html.Div(children=[
             
     dcc.RadioItems(id='radio',
     options=[
-        {'label': 'Detector with Bayesian Updating from Prior', 'value': 'BAY'},
-        {'label': 'User-Selected Posterior Probability', 'value': 'NOM'},
+        
+        {'label': 'Use Single Probability value', 'value': 'NOM'},
+        {'label': 'Use Bayesian Updating with Data', 'value': 'BAY'}
     ],
-    value='BAY'),
+    value='NOM'),
             
     html.Div([
     html.Br(),
@@ -358,11 +358,9 @@ app.layout = html.Div(children=[
         id='coagraph',
         figure={
             'data': [
-                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
-                      "Buy Data Only","Buy Data and Spores"], 'y': valueresults,\
+                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait"], 'y': valueresults,\
                     'type': 'bar', 'name': 'Certain Equivalent'},
-               {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
-                      "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
+               {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait"], 'y': Evalueresults,\
                    'type': 'bar', 'name': 'Probability Weighted Average'},
             ],
             'layout': {
@@ -427,17 +425,14 @@ def update_decision(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1):
     if max(valueresults)==valueresults[1]:
         return 'Based on the model inputs, Mr. Jaeger should buy nothing and wait to harvest, which would yield a CE of ${}'.format(valueresults[1])
     if max(valueresults)==valueresults[2]:
-        return 'Based on the model inputs, Mr. Jaeger buy the spores only, which would yield a CE of ${}'.format(valueresults[2])
-    if max(valueresults)==valueresults[3]:
-        return 'Based on the model inputs, Mr. Jaeger buy the data only, which would yield a CE of ${}'.format(valueresults[3])
-    if max(valueresults)==valueresults[4]:
-        return 'Based on the model inputs, Mr. Jaeger should buy both data and spores, which would yield a CE of ${}'.format(valueresults[4])  
+        return 'Based on the model inputs, Mr. Jaeger buy the spores and wait to harvest, which would yield a CE of ${}'.format(valueresults[2])
+    
     
 @app.callback(
     Output('prain-container', 'children'),
     [Input('prain-slider', 'value')])
 def update_rain(value):
-    return 'Prior probability of light warm rain: {}'.format(value)
+    return 'Posterior probability of light warm rain: {}'.format(value)
 
 @app.callback(
     Output('risktol-container', 'children'),
@@ -467,7 +462,7 @@ def update_acid(value):
     Output('pdetector-container', 'children'),
     [Input('pdetector-slider', 'value')])
 def update_detector(value):
-    return 'Posterior probability of light warm rain, given data: {}'.format(round(value,2))
+    return 'Prior probability of light warm rain: {}'.format(round(value,2))
 
 @app.callback(
     Output('pdetector-slider','value'),
@@ -479,8 +474,7 @@ def update_detector2(radiovalue,prain1):
     if radiovalue=='BAY':
         return max(round(prain-0.5,2),0.1)
     else:
-        return pdetector
-    
+        return prain
 
 @app.callback(
     Output('coagraph', 'figure'),
@@ -513,8 +507,8 @@ def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue,radiov
     if cevalue==[1]:
         return {
             'data': [
-                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
-                      "Buy Data Only","Buy Data and Spores"], 'y': valueresults,\
+                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait",\
+                      "Buy Data Only"], 'y': valueresults,\
                     'type': 'bar', 'name': 'Certain Equivalent ($)'}],
                 'layout': {
                     'title': ' '
@@ -522,11 +516,10 @@ def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue,radiov
     else:
         return {
                 'data': [
-                    {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
-                          "Buy Data Only","Buy Data and Spores"], 'y': valueresults,\
+                    {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait",\
+                          "Buy Data Only"], 'y': valueresults,\
                         'type': 'bar', 'name': 'Certain Equivalent ($)'},
-                   {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores Only",\
-                          "Buy Data Only","Buy Data and Spores"], 'y': Evalueresults,\
+                   {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait"], 'y': Evalueresults,\
                        'type': 'bar', 'name': 'Probability Weighted Average ($)'},
                 ],
                 'layout': {
