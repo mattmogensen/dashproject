@@ -33,7 +33,7 @@ def generate_defaults():
     salesb=80
     repdamage=250000
     repb=150000
-    costdata=1000
+    costdata=0
     costspores=10000
     
 def generate_valuetables():
@@ -201,7 +201,8 @@ def generate_CEs():
     valueresults = [str(int(round(harvestnow))),str(int(round(buynothing))),\
                     str(int(round(buyspores)))]
 
-
+def f(p):
+    return 53/(307+8*(1/p)-1)
 
 def generate_means():
     global Ebuydata,Ebuyspores,Ebuydataandspores,Ebuynothing,Eharvestnow,Evalueresults
@@ -275,33 +276,34 @@ app.layout = html.Div(children=[
     
     html.Div([
         
-    html.Div(id='prain-container',children='Prior probability of light warm rain: 0.67'),
+    #html.Div(id='pdetector-container',children='Posterior probability of light warm rain: 0.67'),
+    html.Div(id='prain-container',children='Probability of light warm rain: 0.67'), 
     
     dcc.Slider(
         id='prain-slider',
         min=0,
         max=1,
         step=0.01,
-        value=0.67,
+        value=f(0.67),
     ),
-        
-    html.Div(id='pdetector-container',children='Posterior probability of light warm rain: 0.67'),
+   
     
-    dcc.Slider(
-        id='pdetector-slider',
-        min=0,
-        max=1,
-        step=0.01,
-        value=0.17,
-    ),
+    html.Br(),
+#    dcc.Slider(
+#        id='pdetector-slider',
+#        min=0,
+#        max=1,
+#        step=0.01,
+#        value=0.67,
+#    ),
             
     dcc.RadioItems(id='radio',
     options=[
         
-        {'label': 'Use Single Probability value', 'value': 'NOM'},
+        {'label': 'Use Prior Probability value', 'value': 'NOM'},
         {'label': 'Use Bayesian Updating with Data', 'value': 'BAY'}
     ],
-    value='NOM'),
+    value='BAY'),
             
     html.Div([
     html.Br(),
@@ -385,17 +387,17 @@ app.layout = html.Div(children=[
     
 @app.callback([Output('prain-slider', 'value'),
                Output('pmold-slider', 'value'),
-               #Output('pdetector-slider', 'value'),
                Output('pacid-slider', 'value'),
                Output('psugar-slider', 'value'),
                Output('risktol-slider','value'),
                Output('checklist','value'),
               ],[Input('reset', 'n_clicks'),Input('radio','value')])
 def on_click(value,radiovalue):
-    if radiovalue=='BAY':
-        return 0.67,0.4,0.8,0.5,72000,[1]
-    else:
-        return 0.67,0.4,0.8,0.5,72000,[1]
+        if radiovalue=='BAY':
+            return round(f(0.67),2),0.4,0.8,0.5,72000,[1]
+        else:
+            return 0.67,0.4,0.8,0.5,72000,[1]
+
     
     
 @app.callback(
@@ -405,17 +407,16 @@ def on_click(value,radiovalue):
      Input('psugar-slider', 'value'),
      Input('pmold-slider', 'value'),
      Input('pacid-slider', 'value'),
-     Input('pdetector-slider', 'value')
+     Input('radio','value')
     ])
-def update_decision(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1):
-    global riskave,prain,pmold,pacid,psugar,pdetector,risktol
+def update_decision(prain1,risktol1,psugar1,pmold1,pacid1,radioval):
+    global riskave,prain,pmold,pacid,psugar,risktol
     riskave=1/risktol1
     risktol=risktol1
     prain=prain1
     pmold=pmold1
     pacid=pacid1
     psugar=psugar1
-    pdetector=pdetector1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -427,12 +428,11 @@ def update_decision(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1):
     if max(valueresults)==valueresults[2]:
         return 'Based on the model inputs, Mr. Jaeger buy the spores and wait to harvest, which would yield a CE of ${}'.format(valueresults[2])
     
-    
 @app.callback(
     Output('prain-container', 'children'),
     [Input('prain-slider', 'value')])
 def update_rain(value):
-    return 'Posterior probability of light warm rain: {}'.format(value)
+    return 'Probability of light warm rain: {}'.format(value)
 
 @app.callback(
     Output('risktol-container', 'children'),
@@ -458,23 +458,23 @@ def update_mold(value):
 def update_acid(value):
     return 'Probability of grape acidity remaining above 0.7%: {}'.format(value)
 
-@app.callback(
-    Output('pdetector-container', 'children'),
-    [Input('pdetector-slider', 'value')])
-def update_detector(value):
-    return 'Prior probability of light warm rain: {}'.format(round(value,2))
+#@app.callback(
+#    Output('pdetector-container', 'children'),
+#    [Input('pdetector-slider', 'value')])
+#def update_detector(value):
+#    return 'Prior probability of light warm rain: {}'.format(round(value,2))
 
-@app.callback(
-    Output('pdetector-slider','value'),
-    [Input('radio','value'),
-     Input('prain-slider','value')])
-def update_detector2(radiovalue,prain1):
-    global prain
-    prain=prain1
-    if radiovalue=='BAY':
-        return max(round(prain-0.5,2),0.1)
-    else:
-        return prain
+#@app.callback(
+#    Output('prain-slider','value'),
+#    [Input('radio','value'),
+#     Input('pdetector-slider','value')])
+#def update_detector2(radiovalue,pdetector1):
+#    global prain
+#    if radiovalue=='BAY':
+#        prain = f(pdetector)
+#        return max(round(f(pdetector),0.1))
+#    else:
+#        return prain
 
 @app.callback(
     Output('coagraph', 'figure'),
@@ -483,22 +483,17 @@ def update_detector2(radiovalue,prain1):
      Input('psugar-slider', 'value'),
      Input('pmold-slider', 'value'),
      Input('pacid-slider', 'value'),
-     Input('pdetector-slider', 'value'),
      Input('checklist','value'),
      Input('radio','value')
     ])
-def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue,radiovalue):
+def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,cevalue,radiovalue):
     global riskave,prain,pmold,pacid,psugar,pdetector,risktol
     riskave=1/risktol1
     risktol=risktol1
-    prain=prain1
     pmold=pmold1
     pacid=pacid1
     psugar=psugar1
-    if radiovalue=='BAY':
-        pdetector=max(prain1-0.5,0.1)
-    else:
-        pdetector=pdetector1
+    prain=prain1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
@@ -533,10 +528,9 @@ def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue,radiov
      Input('psugar-slider', 'value'),
      Input('pmold-slider', 'value'),
      Input('pacid-slider', 'value'),
-     Input('pdetector-slider', 'value'),
      Input('checklist','value')
     ])
-def update_table(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue):
+def update_table(prain1,risktol1,psugar1,pmold1,pacid1,cevalue):
     global riskave,prain,pmold,pacid,psugar,pdetector,risktol
     riskave=1/risktol1
     risktol=risktol1
@@ -544,7 +538,6 @@ def update_table(prain1,risktol1,psugar1,pmold1,pacid1,pdetector1,cevalue):
     pmold=pmold1
     pacid=pacid1
     psugar=psugar1
-    pdetector=pdetector1
     generate_valuetables()
     generate_utables() 
     generate_CEs()
