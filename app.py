@@ -25,7 +25,7 @@ def generate_defaults():
     bcase=700
     bottles=12
     salesthin=20
-    salesnow=29
+    salesnow=28.5
     salesbulk=10
     sales25=35
     sales20=30
