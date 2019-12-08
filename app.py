@@ -250,7 +250,7 @@ col = [
 
 
 tabtitle='Decision Support Tool'
-myheading='AK and Partners Consulting'
+myheading='AK Consulting Analysts, Inc.'
 
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
