@@ -270,7 +270,7 @@ app.layout = html.Div(children=[
     ],
     style={'columnCount': 2,'vertical-align':'center'}),
 
-    html.Div(id='decision-container',children='Based on the model inputs, Mr. Jaeger should harvest now',
+    html.Div(id='decision-container',children='Based on the model inputs, we should inest in ground sensors only',
             style={'color': 'Red', 'fontSize': 14}),
     html.H4('Model Inputs'),
     
@@ -299,8 +299,8 @@ app.layout = html.Div(children=[
     dcc.RadioItems(id='radio',
     options=[
         
-        {'label': 'Use Prior Probability value', 'value': 'NOM'},
-        {'label': 'Use Bayesian Updating with Data', 'value': 'BAY'}
+        {'label': 'Probability of Attack: 10^-5', 'value': 'NOM'},
+        {'label': 'Probability of Attack: 10^-4', 'value': 'BAY'}
     ],
     value='BAY'),
             
