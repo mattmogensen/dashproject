@@ -270,7 +270,7 @@ app.layout = html.Div(children=[
     ],
     style={'columnCount': 2,'vertical-align':'center'}),
 
-    html.Div(id='decision-container',children='Based on the model inputs, Mr. Jaeger should harvest now',
+    html.Div(id='decision-container',children='TBD',
             style={'color': 'Red', 'fontSize': 14}),
     html.H4('Model Inputs'),
     
@@ -394,9 +394,9 @@ app.layout = html.Div(children=[
               ],[Input('reset', 'n_clicks'),Input('radio','value')])
 def on_click(value,radiovalue):
         if radiovalue=='BAY':
-            return round(f(0.67),2),0.4,0.8,0.5,72000,[1]
+            return round(0.8,0.9,0.9,0.9,10000000,[1]
         else:
-            return 0.67,0.4,0.8,0.5,72000,[1]
+            return 0.8,0.95,0.9,0.9,10000000,[1]
 
     
     
