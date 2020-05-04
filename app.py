@@ -277,14 +277,14 @@ app.layout = html.Div(children=[
     html.Div([
         
     #html.Div(id='pdetector-container',children='Posterior probability of light warm rain: 0.67'),
-    html.Div(id='prain-container',children='Probability of light warm rain: 0.67'), 
+    html.Div(id='prain-container',children='Air sensor true positive rare: 0.9'), 
     
     dcc.Slider(
         id='prain-slider',
         min=0,
         max=1,
         step=0.01,
-        value=f(0.67),
+        value=0.9,
     ),
    
     
@@ -317,39 +317,39 @@ app.layout = html.Div(children=[
         value=10000000
     ),
         
-    html.Div(id='pmold-container',children='Ground sensor true positive rate: 0.95'),
-    
+    html.Div(id='pmold-container',children='Air sensor false negative rate: 0.8'),
+  
     dcc.Slider(
         id='pmold-slider',
         min=0,
         max=1,
         step=0.01,
-        value=0.95,
+        value=0.8,
     ),
         
-    html.Div(id='pacid-container',children='Ground sensor false negative rate: 0.9'),
+    html.Div(id='pacid-container',children='Ground sensor true positive rate: 0.95'),
     
     dcc.Slider(
         id='pacid-slider',
         min=0,
         max=1,
         step=0.01,
-        value=0.9,
+        value=0.95,
     ),
         
-    html.Div(id='psugar-container',children='Air sensor true positive rate: 0.8'),
+    html.Div(id='psugar-container',children='Ground sensor false negative rate: 0.9'),
     
     dcc.Slider(
         id='psugar-slider',
         min=0,
         max=1,
         step=0.01,
-        value=0.8,
+        value=0.9,
     )],style={'columnCount':1})],
         
     style={'columnCount': 2}),
                                          
-    html.H4(children='Decision Visualization'),
+    html.H4(children='Visualization'),
     
     dcc.Checklist(id='checklist',
     options=[
@@ -432,31 +432,31 @@ def update_decision(prain1,risktol1,psugar1,pmold1,pacid1,radioval):
     Output('prain-container', 'children'),
     [Input('prain-slider', 'value')])
 def update_rain(value):
-    return 'Probability of light warm rain: {}'.format(value)
+    return 'Air sensor true positive rate: {}'.format(value)
 
 @app.callback(
     Output('risktol-container', 'children'),
     [Input('risktol-slider', 'value')])
 def update_rain(value):
-    return 'Risk Tolerance: ${}'.format(value)
+    return 'Investment: ${}'.format(value)
 
 @app.callback(
     Output('psugar-container', 'children'),
     [Input('psugar-slider', 'value')])
 def update_sugar(value):
-    return 'Air sensor true positive rate: {}'.format(value)
+    return 'Ground sensor false negative rate: {}'.format(value)
 
 @app.callback(
     Output('pmold-container', 'children'),
     [Input('pmold-slider', 'value')])
 def update_mold(value):
-    return 'Ground sensor true positive rate: {}'.format(value)
+    return 'Air sensor false negative rate: {}'.format(value)
 
 @app.callback(
     Output('pacid-container', 'children'),
     [Input('pacid-slider', 'value')])
 def update_acid(value):
-    return 'Ground sensor false negative rate: {}'.format(value)
+    return 'Ground sensor true positive rate: {}'.format(value)
 
 #@app.callback(
 #    Output('pdetector-container', 'children'),
@@ -502,8 +502,8 @@ def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,cevalue,radiovalue):
     if cevalue==[1]:
         return {
             'data': [
-                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait",\
-                      "Buy Data Only"], 'y': valueresults,\
+                {'x': ["Ground Sensor","Air Sensor","Both Ground and Air Sensors",\
+                      "None"], 'y': valueresults,\
                     'type': 'bar', 'name': 'Certain Equivalent ($)'}],
                 'layout': {
                     'title': ' '
@@ -511,10 +511,10 @@ def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,cevalue,radiovalue):
     else:
         return {
                 'data': [
-                    {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait",\
-                          "Buy Data Only"], 'y': valueresults,\
+                    {'x': ["Ground Sensor","Air Sensor","Both Ground and Air Sensors",\
+                          "None"], 'y': valueresults,\
                         'type': 'bar', 'name': 'Certain Equivalent ($)'},
-                   {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait"], 'y': Evalueresults,\
+                   {'x': ["Ground Sensor","Air Sensor","Both Ground and Air Sensors"], 'y': Evalueresults,\
                        'type': 'bar', 'name': 'Probability Weighted Average ($)'},
                 ],
                 'layout': {
