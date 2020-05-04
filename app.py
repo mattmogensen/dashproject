@@ -498,12 +498,12 @@ def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,cevalue,radiovalue):
     generate_utables() 
     generate_CEs()
     generate_means()
-    df = generate_dataframe(Evalueresults,valueresults)
+    df = generate_dataframe(Evalueresults/10,valueresults/10)
     if cevalue==[1]:
         return {
             'data': [
                 {'x': ["Ground Sensor","Air Sensor","Both Ground and Air Sensors",\
-                      "None"], 'y': valueresults,\
+                      "None"], 'y': valueresults/10,\
                     'type': 'bar', 'name': 'Certain Equivalent ($)'}],
                 'layout': {
                     'title': ' '
@@ -512,9 +512,9 @@ def update_graph(prain1,risktol1,psugar1,pmold1,pacid1,cevalue,radiovalue):
         return {
                 'data': [
                     {'x': ["Ground Sensor","Air Sensor","Both Ground and Air Sensors",\
-                          "None"], 'y': valueresults,\
+                          "None"], 'y': valueresults/10,\
                         'type': 'bar', 'name': 'Certain Equivalent ($)'},
-                   {'x': ["Ground Sensor","Air Sensor","Both Ground and Air Sensors"], 'y': Evalueresults,\
+                   {'x': ["Ground Sensor","Air Sensor","Both Ground and Air Sensors"], 'y': Evalueresults/10,\
                        'type': 'bar', 'name': 'Probability Weighted Average ($)'},
                 ],
                 'layout': {
@@ -544,14 +544,14 @@ def update_table(prain1,risktol1,psugar1,pmold1,pacid1,cevalue):
     generate_means()
     if cevalue==[1]:
         Row2 = ['Certain Equivalent ($)']
-        Row2 = Row2 + valueresults
+        Row2 = Row2 + valueresults/10
         df = pd.DataFrame([Row2])
         return df.to_dict('rows'), col
     else:
         Row1 = ['Probability Weighted Average ($)']
         Row2 = ['Certain Equivalent ($)']
-        Row1 = Row1 + Evalueresults
-        Row2 = Row2 + valueresults
+        Row1 = Row1 + Evalueresults/10
+        Row2 = Row2 + valueresults/10
         df = pd.DataFrame([Row2, Row1])
         return df.to_dict('rows'), col
 
