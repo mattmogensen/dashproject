@@ -244,13 +244,13 @@ df = generate_dataframe(Evalueresults,valueresults)
 global col
 col = [
     {"id": '0', "name": " "},
-    {"id": '1', "name": "Harvest Now"},
-    {"id": '2', "name": "Buy Nothing and Wait"},
-    {"id": '3', "name": "Buy Spores  and Wait"}]
+    {"id": '1', "name": "Ground Sensors"},
+    {"id": '2', "name": "Air Sensors"},
+    {"id": '3', "name": "Ground and Air Sensors"}]
 
 
 tabtitle='Decision Support Tool'
-myheading='AK Consulting Analysts, Inc.'
+myheading='REM Response, Inc.'
 
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -307,44 +307,44 @@ app.layout = html.Div(children=[
             
     html.Div([
     html.Br(),
-    html.Div(id='risktol-container',children='Risk Tolerance: $72000'),
+    html.Div(id='risktol-container',children='Investment: $10000000'),
     
     dcc.Slider(
         id='risktol-slider',
-        min=1000,
-        max=1000000,
-        step=1000,
-        value=72000
+        min=10000,
+        max=20000000,
+        step=10000,
+        value=10000000
     ),
         
-    html.Div(id='pmold-container',children='Probability of botrytis mold developing, given light warm rain: 0.4'),
+    html.Div(id='pmold-container',children='Ground sensor true positive rate: 0.95'),
     
     dcc.Slider(
         id='pmold-slider',
         min=0,
         max=1,
         step=0.01,
-        value=0.4,
+        value=0.95,
     ),
         
-    html.Div(id='pacid-container',children='Probability of grape acidity remaining above 0.7%: 0.8'),
+    html.Div(id='pacid-container',children='Ground sensor false negative rate: 0.9'),
     
     dcc.Slider(
         id='pacid-slider',
         min=0,
         max=1,
         step=0.01,
-        value=0.8,
+        value=0.9,
     ),
         
-    html.Div(id='psugar-container',children='Probability of sugar content rising above 25%, given acidity above 0.7%: 0.5'),
+    html.Div(id='psugar-container',children='Air sensor true positive rate: 0.8'),
     
     dcc.Slider(
         id='psugar-slider',
         min=0,
         max=1,
         step=0.01,
-        value=0.5,
+        value=0.8,
     )],style={'columnCount':1})],
         
     style={'columnCount': 2}),
@@ -353,16 +353,16 @@ app.layout = html.Div(children=[
     
     dcc.Checklist(id='checklist',
     options=[
-        {'label': 'Certain Equivalent (CE) Display only', 'value': 1},
+        {'label': 'Display expected value only', 'value': 1},
     ],value=[1]),
         
     dcc.Graph(
         id='coagraph',
         figure={
             'data': [
-                {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait"], 'y': valueresults,\
+                {'x': ["Ground Sensor Only","Air Sensor Only","Ground and Air Sensors"], 'y': valueresults,\
                     'type': 'bar', 'name': 'Certain Equivalent'},
-               {'x': ["Harvest Now","Buy Nothing and Wait","Buy Spores and Wait"], 'y': Evalueresults,\
+               {'x': ["Ground Sensor Only","Air Sensor Only","Ground and Air Sensors"], 'y': Evalueresults,\
                    'type': 'bar', 'name': 'Probability Weighted Average'},
             ],
             'layout': {
@@ -422,11 +422,11 @@ def update_decision(prain1,risktol1,psugar1,pmold1,pacid1,radioval):
     generate_CEs()
     generate_means()
     if max(valueresults)==valueresults[0]:
-        return 'Based on the model inputs, Mr. Jaeger should harvest now, which would yield a CE of ${}'.format(valueresults[0])
+        return 'Based on the model inputs, we should invest in ground sensors only, which would cost ${} per life saved.'.format(valueresults[0])
     if max(valueresults)==valueresults[1]:
-        return 'Based on the model inputs, Mr. Jaeger should buy nothing and wait to harvest, which would yield a CE of ${}'.format(valueresults[1])
+        return 'Based on the model inputs, we should invest in air sensors only, which would cost ${} per life saved.'.format(valueresults[1])
     if max(valueresults)==valueresults[2]:
-        return 'Based on the model inputs, Mr. Jaeger buy the spores and wait to harvest, which would yield a CE of ${}'.format(valueresults[2])
+        return 'Based on the model inputs, we should invest in both ground and air sensors, which would cost ${} per life saved.'.format(valueresults[2])
     
 @app.callback(
     Output('prain-container', 'children'),
@@ -444,19 +444,19 @@ def update_rain(value):
     Output('psugar-container', 'children'),
     [Input('psugar-slider', 'value')])
 def update_sugar(value):
-    return 'Probability of sugar content rising above 25%, given acidity above 0.7%: {}'.format(value)
+    return 'Air sensor true positive rate: {}'.format(value)
 
 @app.callback(
     Output('pmold-container', 'children'),
     [Input('pmold-slider', 'value')])
 def update_mold(value):
-    return 'Probability of botrytis mold developing, given light warm rain: {}'.format(value)
+    return 'Ground sensor true positive rate: {}'.format(value)
 
 @app.callback(
     Output('pacid-container', 'children'),
     [Input('pacid-slider', 'value')])
 def update_acid(value):
-    return 'Probability of grape acidity remaining above 0.7%: {}'.format(value)
+    return 'Ground sensor false negative rate: {}'.format(value)
 
 #@app.callback(
 #    Output('pdetector-container', 'children'),
