@@ -14,12 +14,12 @@ def generate_defaults():
     bcase,bottles,salesthin,salesnow,salesbulk,sales25,sales20,\
     sales07,salesb,repdamage,repb,costdata,costspores,pacid
     
-    prain=0.67
+    prain=0.8
     pacid=0.8
     pdetector=0.17
-    pmold=0.4
-    psugar=0.5
-    risktol=72000
+    pmold=0.95
+    psugar=0.9
+    risktol=10000000
     riskave=1/risktol
     nonbcase=1000
     bcase=700
@@ -265,7 +265,7 @@ app.layout = html.Div(children=[
         html.H2(myheading),
         html.Div([
             html.Button(id='reset',children='Reset Defaults',n_clicks=0),
-            html.Div(['Copyright 2019      '])
+            html.Div(['MS&E 250B Spring 2020      '])
         ],style={'horizontal-align': 'right','textAlign': 'right'})#
     ],
     style={'columnCount': 2,'vertical-align':'center'}),
