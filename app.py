@@ -300,8 +300,8 @@ app.layout = html.Div(children=[
     dcc.RadioItems(id='radio',
     options=[
         
-        {'label': 'Use Uniform Prior ', 'value': 'NOM'},
-        {'label': 'Use Beta Prior', 'value': 'BAY'}
+        {'label': 'Probability of Attack: 10^-5', 'value': 'NOM'},
+        {'label': 'Probability of Attack: 10^-4, 'value': 'BAY'}
     ],
     value='BAY'),
             
