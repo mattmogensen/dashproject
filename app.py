@@ -394,9 +394,9 @@ app.layout = html.Div(children=[
               ],[Input('reset', 'n_clicks'),Input('radio','value')])
 def on_click(value,radiovalue):
         if radiovalue=='BAY':
-            return round(0.85,0.8,0.9,0.9,10000000,[1]
+            return round(f(0.67),2),0.4,0.8,0.5,72000,[1]
         else:
-            return 0.85,0.8,0.9,0.9,10000000,[1]
+            return 0.67,0.4,0.8,0.5,72000,[1]
 
     
     
