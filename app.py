@@ -276,7 +276,6 @@ app.layout = html.Div(children=[
     
     html.Div([
         
-    #html.Div(id='pdetector-container',children='Posterior probability of light warm rain: 0.67'),
     html.Div(id='prain-container',children='Air sensor true positive rare: 0.9'), 
     
     dcc.Slider(
@@ -307,6 +306,7 @@ app.layout = html.Div(children=[
             
     html.Div([
     html.Br(),
+
     html.Div(id='risktol-container',children='Investment: $10000000'),
     
     dcc.Slider(
@@ -315,7 +315,7 @@ app.layout = html.Div(children=[
         max=20000000,
         step=10000,
         value=10000000
-    ),
+    ),   
         
     html.Div(id='pmold-container',children='Air sensor false negative rate: 0.8'),
   
