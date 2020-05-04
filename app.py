@@ -14,11 +14,11 @@ def generate_defaults():
     bcase,bottles,salesthin,salesnow,salesbulk,sales25,sales20,\
     sales07,salesb,repdamage,repb,costdata,costspores,pacid
     
-    prain=0.8
+    prain=0.67
     pacid=0.8
     pdetector=0.17
-    pmold=0.95
-    psugar=0.9
+    pmold=0.4
+    psugar=0.5
     risktol=72000
     riskave=1/risktol
     nonbcase=1000
@@ -300,8 +300,8 @@ app.layout = html.Div(children=[
     dcc.RadioItems(id='radio',
     options=[
         
-        {'label': 'Probability of Attack: 10^-5', 'value': 'NOM'},
-        {'label': 'Probability of Attack: 10^-4, 'value': 'BAY'}
+        {'label': 'Use Prior Probability value', 'value': 'NOM'},
+        {'label': 'Use Bayesian Updating with Data', 'value': 'BAY'}
     ],
     value='BAY'),
             
